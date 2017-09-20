@@ -3215,6 +3215,29 @@ def prompt(obj, results, noninteractive=False, deep=False, subprompt=False, sugg
                 print('Invalid input')
                 break
 
+def print_single_rec_with_filter(row, field_filter):
+    """Print a single DB record with a field filter.
+
+    User determines which fields in the records by using the
+    --format option.
+
+    Parameters
+    ----------
+    row : tuple
+        Tuple representing bookmark record data.
+    field_filter : int
+        Integer indicating which record fields to print.
+    """
+
+    if field_filter == 1:
+        print('%s\t%s' % (row[0], row[1]))
+    elif field_filter == 2:
+        print('%s\t%s\t%s' % (row[0], row[1], row[3][1:-1]))
+    elif field_filter == 3:
+        print('%s\t%s' % (row[0], row[2]))
+    elif field_filter == 4:
+        print('%s\t%s\t%s\t%s' % (row[0], row[1], row[2], row[3][1:-1]))
+
 
 def print_single_rec(row, idx=0):  # NOQA
     """Print a single DB record.
@@ -4145,8 +4168,11 @@ POSITIONAL ARGUMENTS:
             oneshot = True
             update_search_results = True
 
-        if not args.json:
+        if not args.json and not args.format:
             prompt(bdb, search_results, oneshot, args.deep)
+        elif not args.json:
+            for result in search_results:
+                print_single_rec_with_filter(result, field_filter=args.format)
         else:
             # Printing in Json format is non-interactive
             print(format_json(search_results, field_filter=args.format))
